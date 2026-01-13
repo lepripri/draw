@@ -10,7 +10,7 @@ body { margin:0; display:flex; height:100vh; font-family:Arial; }
 svg { flex:1; border-left:1px solid #aaa; cursor:crosshair; }
 
 .selected { stroke:red !important; }
-.handle { fill:white; stroke:black; cursor:pointer; }
+.handle { fill:white; stroke:black;}
 .rotate { fill:yellow; cursor:grab; }
 </style>
 </head>
@@ -99,12 +99,14 @@ function createHandles(){
     [b.x,b.y],[b.x+b.width,b.y],
     [b.x,b.y+b.height],[b.x+b.width,b.y+b.height]
   ];
-  pts.forEach(p=>{
+  const cursors = ["nw-resize","ne-resize","sw-resize","se-resize"];
+  pts.forEach((p,i)=>{
     let h=document.createElementNS(ns,"rect");
     h.setAttribute("x",p[0]-4);
     h.setAttribute("y",p[1]-4);
     h.setAttribute("width",8);
     h.setAttribute("height",8);
+    h.style.cursor = cursors[i];
     h.classList.add("handle");
     h.onmousedown=e=>resize(e,p);
     svg.appendChild(h);
@@ -125,14 +127,36 @@ function createHandles(){
 function removeHandles(){ handles.forEach(h=>h.remove()); handles=[]; }
 
 /* ===================== RESIZE ===================== */
-function resize(e,p){
+function resize(e, origin) {
   e.stopPropagation();
-  svg.onmousemove=ev=>{
-    let x=ev.offsetX,y=ev.offsetY;
-    selected.setAttribute("width",Math.abs(x-p[0]));
-    selected.setAttribute("height",Math.abs(y-p[1]));
+
+  const box = selected.getBBox();
+  const isEllipse = selected.tagName === "ellipse";
+
+  svg.onmousemove = ev => {
+    let x = ev.offsetX;
+    let y = ev.offsetY;
+
+    let w = Math.abs(x - origin[0]);
+    let h = Math.abs(y - origin[1]);
+
+    if (isEllipse) {
+      selected.setAttribute("rx", w / 2);
+      selected.setAttribute("ry", h / 2);
+      selected.setAttribute("cx", origin[0] + w / 2);
+      selected.setAttribute("cy", origin[1] + h / 2);
+    } else {
+      selected.setAttribute("x", Math.min(x, origin[0]));
+      selected.setAttribute("y", Math.min(y, origin[1]));
+      selected.setAttribute("width", w);
+      selected.setAttribute("height", h);
+    }
   };
-  svg.onmouseup=()=>{ svg.onmousemove=null; createHandles(); };
+
+  svg.onmouseup = () => {
+    svg.onmousemove = null;
+    createHandles();
+  };
 }
 
 /* ===================== ROTATE ===================== */
@@ -149,22 +173,34 @@ function startRotate(e){
 }
 
 /* ===================== KEYBOARD MOVE ===================== */
-document.onkeydown=e=>{
-  if(!selected) return;
-  let d=e.shiftKey?10:1;
-  let x=(selected.getAttribute("x")||0)*1;
-  let y=(selected.getAttribute("y")||0)*1;
-  if(e.key==="ArrowLeft") selected.setAttribute("x",x-d);
-  if(e.key==="ArrowRight") selected.setAttribute("x",x+d);
-  if(e.key==="ArrowUp") selected.setAttribute("y",y-d);
-  if(e.key==="ArrowDown") selected.setAttribute("y",y+d);
+document.onkeydown = e => {
+  if (!selected) return;
+
+  let step = e.shiftKey ? 10 : 1;
+  let dx = 0, dy = 0;
+
+  if (e.key === "ArrowLeft") dx = -step;
+  if (e.key === "ArrowRight") dx = step;
+  if (e.key === "ArrowUp") dy = -step;
+  if (e.key === "ArrowDown") dy = step;
+  if (!dx && !dy) return;
+
+  e.preventDefault();
+
+  let t = selected.getAttribute("transform") || "";
+  t += ` translate(${dx},${dy})`;
+  selected.setAttribute("transform", t);
+
   createHandles();
 };
 
 /* ===================== EXPORT SVG ===================== */
-function exportSVG(){
-  let blob=new Blob([svg.outerHTML],{type:"image/svg+xml"});
-  download(blob,"dessin.svg");
+function exportSVG() {
+  removeHandles();
+  let clone = svg.cloneNode(true);
+  let blob = new Blob([clone.outerHTML], { type: "image/svg+xml" });
+  download(blob, "dessin.svg");
+  createHandles();
 }
 
 /* ===================== EXPORT PNG ===================== */
