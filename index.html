@@ -76,6 +76,17 @@ button {padding: 0px;}
   <hr>
   <button onclick="exportSVG()">Exporter SVG</button>
   <button onclick="exportPNG()">Convertir en Bitmap</button>
+<hr>
+<div id="textTools" style="display:none">
+  <input type="color" onchange="setTextColor(this.value)">
+  <input type="number" min="6" max="200" value="16" onchange="setTextSize(this.value)">
+  <select onchange="setTextFont(this.value)">
+    <option>Arial</option>
+    <option>Verdana</option>
+    <option>Times New Roman</option>
+    <option>Courier New</option>
+  </select>
+</div>
 </div>
 
 <svg id="canvas"></svg>
@@ -86,11 +97,95 @@ const ns = "http://www.w3.org/2000/svg";
 let tool="select", current=null, selected=null;
 let startX,startY;
 let handles=[];
+let undoStack = [];
+let redoStack = [];
+const MAX_HISTORY = 50;
+let mouseX = 0, mouseY = 0;
+svg.addEventListener("mousemove", e => {
+  mouseX = e.offsetX;
+  mouseY = e.offsetY;
+});
 
 /* ===================== TOOLS ===================== */
 function setTool(t){ tool=t; removeHandles(); }
 
+/* ================== UNDO / REDO ================== */
+function saveState() {
+  undoStack.push(svg.innerHTML);
+
+  if (undoStack.length > MAX_HISTORY) {
+    undoStack.shift();
+  }
+
+  redoStack.length = 0; // reset redo
+}
+function undo() {
+  if (undoStack.length === 0) return;
+
+  redoStack.push(svg.innerHTML);
+  svg.innerHTML = undoStack.pop();
+
+  removeHandles();
+  selected = null;
+}
+
+function redo() {
+  if (redoStack.length === 0) return;
+
+  undoStack.push(svg.innerHTML);
+  svg.innerHTML = redoStack.pop();
+
+  removeHandles();
+  selected = null;
+}
+document.addEventListener("keydown", e => {
+  if (!e.ctrlKey) return;
+
+  if (e.key.toLowerCase() === "z" && !e.shiftKey) {
+    e.preventDefault();
+    undo();
+  }
+
+  if (
+    e.key.toLowerCase() === "y" ||
+    (e.key.toLowerCase() === "z" && e.shiftKey)
+  ) {
+    e.preventDefault();
+    redo();
+  }
+});
+
 /* ===================== DRAW ===================== */
+function insertImage(dataURL) {
+  saveState();
+
+  const img = document.createElementNS(ns, "image");
+  img.setAttributeNS(null, "href", dataURL);
+  img.setAttribute("x", 50);
+  img.setAttribute("y", 50);
+  img.setAttribute("width", 200);
+  img.setAttribute("height", 200);
+  img.setAttribute("x", mouseX - 100);
+  img.setAttribute("y", mouseY - 100);
+  svg.appendChild(img);
+  select(img);
+}
+function resizeText(e) {
+  e.stopPropagation();
+
+  let startY = e.offsetY;
+  let size = parseFloat(getComputedStyle(selected).fontSize) || 16;
+
+  svg.onmousemove = ev => {
+    let dy = startY - ev.offsetY;
+    let newSize = Math.max(6, size + dy * 0.3);
+
+    selected.setAttribute("font-size", newSize);
+    updateHandlesLive();
+  };
+
+  svg.onmouseup = () => svg.onmousemove = null;
+}
 svg.onmousemove = ev => {
   let x = ev.offsetX;
   let y = ev.offsetY;
@@ -111,8 +206,37 @@ svg.onmousemove = ev => {
   }
 
   // 🔥 NOUVEAU : mise à jour live des poignées
+  saveState();
   updateHandlesLive();
 };
+
+function resizeLine(e, attr) {
+  e.stopPropagation();
+
+  const x0 = parseFloat(selected.getAttribute(attr[0]));
+  const y0 = parseFloat(selected.getAttribute(attr[1]));
+
+  svg.onmousemove = ev => {
+    let x = ev.offsetX;
+    let y = ev.offsetY;
+
+    // Shift = angle contraint
+    if (ev.shiftKey) {
+      let dx = x - x0;
+      let dy = y - y0;
+      if (Math.abs(dx) > Math.abs(dy)) y = y0;
+      else x = x0;
+    }
+
+    selected.setAttribute(attr[0], x);
+    selected.setAttribute(attr[1], y);
+
+    updateHandlesLive();
+  };
+  saveState();
+  svg.onmouseup = () => svg.onmousemove = null;
+}
+
 
 svg.onmouseup = () => {
   svg.onmousemove = null;
@@ -137,16 +261,34 @@ function create(t,x,y){
     e.setAttribute("x",x); e.setAttribute("y",y);
     e.textContent=txt;
   }
+  saveState();
   return e;
 }
 
 /* ===================== SELECTION ===================== */
+function setTextColor(c){
+  if(selected?.tagName==="text")
+    selected.setAttribute("fill", c);saveState();
+}
+
+function setTextSize(s){
+  if(selected?.tagName==="text")
+    selected.setAttribute("font-size", s);saveState();
+}
+
+function setTextFont(f){
+  if(selected?.tagName==="text")
+    selected.setAttribute("font-family", f);saveState();
+}
+
 function select(el){
   if(el===svg) return;
   if(el.classList.contains("handle") || el.classList.contains("rotate")) return;
   if(selected) selected.classList.remove("selected");
   selected=el;
   selected.classList.add("selected");
+  document.getElementById("textTools").style.display =
+  selected.tagName === "text" ? "block" : "none";
   createHandles();
 }
 
@@ -182,42 +324,133 @@ function createHandles(){
   r.onmousedown=startRotate;
   svg.appendChild(r);
   handles.push(r);
+if (selected.tagName === "line") {
+  const pts = [
+    ["x1","y1"],
+    ["x2","y2"]
+  ];
+
+  pts.forEach((p, i) => {
+    let h = document.createElementNS(ns, "circle");
+    h.setAttribute("r", 6);
+    h.setAttribute("cx", selected.getAttribute(p[0]));
+    h.setAttribute("cy", selected.getAttribute(p[1]));
+    h.classList.add("handle");
+    h.style.cursor = "move";
+
+    h.onmousedown = e => resizeLine(e, p);
+    svg.appendChild(h);
+    handles.push(h);
+  });
+  return;
+}
+  if (selected.tagName === "polygon") {
+  const pts = selected.points;
+
+  for (let i = 0; i < pts.numberOfItems; i++) {
+    let p = pts.getItem(i);
+
+    let h = document.createElementNS(ns, "circle");
+    h.setAttribute("cx", p.x);
+    h.setAttribute("cy", p.y);
+    h.setAttribute("r", 6);
+    h.classList.add("handle");
+    h.style.cursor = "move";
+
+    h.onmousedown = e => resizePolygon(e, i);
+    svg.appendChild(h);
+    handles.push(h);
+  }
+  return;
+}
+if (selected.tagName === "text") {
+  const box = selected.getBBox();
+
+  let h = document.createElementNS(ns, "rect");
+  h.setAttribute("x", box.x + box.width);
+  h.setAttribute("y", box.y + box.height);
+  h.setAttribute("width", 8);
+  h.setAttribute("height", 8);
+  h.classList.add("handle");
+  h.style.cursor = "nwse-resize";
+
+  h.onmousedown = resizeText;
+  svg.appendChild(h);
+  handles.push(h);
+  return;
+}
 }
 
 function removeHandles(){ handles.forEach(h=>h.remove()); handles=[]; }
 
 /* ===================== RESIZE ===================== */
 function resize(e, origin) {
-  if(["line","polygon","text"].includes(selected.tagName)) return;
   e.stopPropagation();
 
   const box = selected.getBBox();
-  const isEllipse = selected.tagName === "ellipse";
+  const tag = selected.tagName;
+  const isEllipse = tag === "ellipse";
+
+  const startBox = {
+    x: box.x,
+    y: box.y,
+    w: box.width,
+    h: box.height,
+    cx: box.x + box.width / 2,
+    cy: box.y + box.height / 2,
+    ratio: box.width / box.height || 1
+  };
 
   svg.onmousemove = ev => {
     let x = ev.offsetX;
     let y = ev.offsetY;
 
-    let w = Math.abs(x - origin[0]);
-    let h = Math.abs(y - origin[1]);
+    let dx = x - origin[0];
+    let dy = y - origin[1];
+
+    let w = Math.abs(dx);
+    let h = Math.abs(dy);
+
+    // ↔️ SHIFT : proportionnel
+    if (ev.shiftKey) {
+      if (w / h > startBox.ratio) {
+        w = h * startBox.ratio;
+      } else {
+        h = w / startBox.ratio;
+      }
+    }
+
+    let newX = Math.min(x, origin[0]);
+    let newY = Math.min(y, origin[1]);
+
+    // 🎯 ALT : depuis le centre
+    if (ev.altKey) {
+      newX = startBox.cx - w;
+      newY = startBox.cy - h;
+      w *= 2;
+      h *= 2;
+    }
 
     if (isEllipse) {
+      selected.setAttribute("cx", newX + w / 2);
+      selected.setAttribute("cy", newY + h / 2);
       selected.setAttribute("rx", w / 2);
       selected.setAttribute("ry", h / 2);
-      selected.setAttribute("cx", origin[0] + w / 2);
-      selected.setAttribute("cy", origin[1] + h / 2);
     } else {
-      selected.setAttribute("x", Math.min(x, origin[0]));
-      selected.setAttribute("y", Math.min(y, origin[1]));
+      selected.setAttribute("x", newX);
+      selected.setAttribute("y", newY);
       selected.setAttribute("width", w);
       selected.setAttribute("height", h);
     }
+
+    // 🔄 poignées dynamiques
+    updateHandlesLive();
   };
 
   svg.onmouseup = () => {
     svg.onmousemove = null;
-    createHandles();
   };
+  saveState();
 }
 
 /* ===================== ROTATE ===================== */
@@ -231,6 +464,20 @@ function startRotate(e){
     selected.setAttribute("transform",`rotate(${a} ${cx} ${cy})`);
   };
   svg.onmouseup=()=>{ svg.onmousemove=null; };
+  function resizePolygon(e, index) {
+  e.stopPropagation();
+
+  svg.onmousemove = ev => {
+    let p = selected.points.getItem(index);
+    p.x = ev.offsetX;
+    p.y = ev.offsetY;
+
+    updateHandlesLive();
+  };
+
+  svg.onmouseup = () => svg.onmousemove = null;
+}
+saveState();
 }
 
 /* ===================== KEYBOARD MOVE ===================== */
@@ -257,6 +504,7 @@ document.onkeydown = e => {
   selected.setAttribute("transform", t);
 
   createHandles();
+  saveState();
 };
 
 /* ===================== EXPORT SVG ===================== */
@@ -289,6 +537,27 @@ function download(blob,name){
   a.download=name;
   a.click();
 }
+function handlePaste(e) {
+  const items = e.clipboardData?.items;
+  if (!items) return;
+
+  for (let item of items) {
+    if (item.type.startsWith("image/")) {
+      e.preventDefault();
+
+      const file = item.getAsFile();
+      const reader = new FileReader();
+
+      reader.onload = ev => {
+        insertImage(ev.target.result);
+      };
+
+      reader.readAsDataURL(file);
+      break;
+    }
+  }
+}
+document.addEventListener("paste", handlePaste);
 </script>
 
 
