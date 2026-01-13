@@ -1,26 +1,26 @@
-<!DOCTYPE html>
 <html lang="fr"><head>
 <meta charset="UTF-8">
 <title>Éditeur SVG Avancé</title>
 <style>
 body { margin:0; display:flex; height:100vh; font-family:Arial; }
 #tools { width:220px; background:#eee; padding:10px; }
-#tools button:not(.tools) { width:100%; margin-bottom:5px; }
-svg { flex:1; border-left:1px solid #aaa; cursor:crosshair; }
+button {padding: 0px;}
+#tools button:not(.tools) { width:100%; margin-bottom:5px;}
+#canvas { flex:1; border-left:1px solid #aaa; cursor:crosshair; * {cursor: default;}}
 #toolsDiv {}
 .tools {width: 30px}
 .selected { stroke:red !important; }
 .handle { fill:white; stroke:black;}
-.rotate { fill:yellow; cursor:grab; }
+.rotate { fill:yellow; cursor:grab !important; }
 </style>
 </head>
 <body>
 
 <div id="tools"><div id="toolsDiv">
   <button class="tools" onclick="setTool('select')"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="20px" height="20px" viewBox="0 0 20 20" version="1.1">
-    <!-- Generator: Sketch 43.2 (39069) - http://www.bohemiancoding.com/sketch -->
-    <title>select</title>
-    <desc>Created with Sketch.</desc>
+    
+    <title>curseur</title>
+    <desc>pointeur de souris noir</desc>
     <defs></defs>
     <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
         <g id="select" fill="#575E75">
@@ -29,9 +29,9 @@ svg { flex:1; border-left:1px solid #aaa; cursor:crosshair; }
     </g>
 </svg></button>
   <button class="tools" onclick="setTool('rect')"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="20px" height="20px" viewBox="0 0 20 20" version="1.1">
-    <!-- Generator: Sketch 43.2 (39069) - http://www.bohemiancoding.com/sketch -->
+    
     <title>rectangle</title>
-    <desc>Created with Sketch.</desc>
+    <desc>créez des réctangles : outils de réctangles</desc>
     <defs></defs>
     <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" stroke-linecap="round" stroke-linejoin="round">
         <g id="rectangle" stroke="#575E75" stroke-width="1.5">
@@ -40,9 +40,9 @@ svg { flex:1; border-left:1px solid #aaa; cursor:crosshair; }
     </g>
 </svg></button>
   <button class="tools" onclick="setTool('ellipse')"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="20px" height="20px" viewBox="0 0 20 20" version="1.1">
-    <!-- Generator: Sketch 43.2 (39069) - http://www.bohemiancoding.com/sketch -->
+    
     <title>oval</title>
-    <desc>Created with Sketch.</desc>
+    <desc>créez des ovals</desc>
     <defs></defs>
     <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
         <g id="oval" stroke-width="1.5" stroke="#575E75">
@@ -51,9 +51,9 @@ svg { flex:1; border-left:1px solid #aaa; cursor:crosshair; }
     </g>
 </svg></button>
   <button class="tools" onclick="setTool('line')"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="20px" height="20px" viewBox="0 0 20 20" version="1.1">
-    <!-- Generator: Sketch 43.2 (39069) - http://www.bohemiancoding.com/sketch -->
-    <title>line</title>
-    <desc>Created with Sketch.</desc>
+    
+    <title>ligne</title>
+    <desc>outil ligne : créez des lignes</desc>
     <defs></defs>
     <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" stroke-linecap="square">
         <g id="line" stroke="#575E75" stroke-width="2">
@@ -61,11 +61,11 @@ svg { flex:1; border-left:1px solid #aaa; cursor:crosshair; }
         </g>
     </g>
 </svg></button>
-  <button class="tools" onclick="setTool('triangle')">Triangle</button>
+  <button class="tools" onclick="setTool('triangle')"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" width="11.5" height="20" viewBox="0,0,11.5,11.5"><title>trangle</title><desc>outil trangle : créez des triangles</desc><defs></defs><g transform="translate(-234.25,-174.25)"><g fill="none" fill-rule="evenodd" stroke="#575e75" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10"><path d="M235,185l5.01683,-10l4.98317,10z"></path></g></g></svg></button>
   <button class="tools" onclick="setTool('text')"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="20px" height="20px" viewBox="0 0 20 20" version="1.1">
     <!-- Generator: Sketch 43.2 (39069) - http://www.bohemiancoding.com/sketch -->
     <title>text</title>
-    <desc>Created with Sketch.</desc>
+    <desc>text tool : create and edit text</desc>
     <defs></defs>
     <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
         <g id="text" fill="#575E75">
@@ -78,7 +78,7 @@ svg { flex:1; border-left:1px solid #aaa; cursor:crosshair; }
   <button onclick="exportPNG()">Convertir en Bitmap</button>
 </div>
 
-<svg id="canvas"><rect fill="none" stroke="black" x="54" y="86" width="337" height="252"></rect><ellipse fill="none" stroke="black" cx="475.5" cy="438.5" rx="103.5" ry="104.5" class="selected"></ellipse><rect x="368" y="330" width="8" height="8" class="handle" style="cursor: nw-resize;"></rect><rect x="575" y="330" width="8" height="8" class="handle" style="cursor: ne-resize;"></rect><rect x="368" y="538.9999847412109" width="8" height="8" class="handle" style="cursor: sw-resize;"></rect><rect x="575" y="538.9999847412109" width="8" height="8" class="handle" style="cursor: se-resize;"></rect><circle cx="475.5" cy="314" r="6" class="rotate"></circle></svg>
+<svg id="canvas"></svg>
 
 <script>
 const svg = document.getElementById("canvas");
@@ -275,6 +275,7 @@ function download(blob,name){
   a.click();
 }
 </script>
+
 
 
 </body></html>
