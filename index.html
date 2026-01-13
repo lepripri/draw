@@ -2,13 +2,11 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<title>Éditeur SVG</title>
+<title>Éditeur SVG avec Undo/Redo</title>
 <style>
 body { font-family: Arial, sans-serif; margin: 0; display: flex; height: 100vh; }
-#tools { width: 180px; background:#f0f0f0; padding:10px; box-sizing:border-box; }
-#tools button, #tools input {
-  width: 100%; margin-bottom: 6px;
-}
+#tools { width: 200px; background:#f0f0f0; padding:10px; box-sizing:border-box; }
+#tools button, #tools input { width: 100%; margin-bottom: 6px; }
 svg { flex: 1; border-left: 1px solid #ccc; cursor: crosshair; }
 .selected { stroke: red !important; stroke-width: 2 !important; }
 </style>
@@ -16,12 +14,14 @@ svg { flex: 1; border-left: 1px solid #ccc; cursor: crosshair; }
 <body>
 
 <div id="tools">
-  <button onclick="setTool('select')">Sélectionner</button>
+  <button onclick="setTool('select')">Sélection</button>
   <button onclick="setTool('rect')">Rectangle</button>
   <button onclick="setTool('line')">Ligne</button>
   <button onclick="setTool('ellipse')">Ovale</button>
   <button onclick="setTool('triangle')">Triangle</button>
   <button onclick="setTool('text')">Texte</button>
+  <button onclick="undo()">Undo (Ctrl+Z)</button>
+  <button onclick="redo()">Redo (Ctrl+Y)</button>
   <button onclick="copy()">Copier</button>
   <button onclick="paste()">Coller</button>
   <button onclick="cut()">Couper</button>
@@ -29,7 +29,7 @@ svg { flex: 1; border-left: 1px solid #ccc; cursor: crosshair; }
   <input type="file" accept="image/*" onchange="importImage(event)">
 </div>
 
-<svg id="canvas" width="100%" height="100%"></svg>
+<svg id="canvas"></svg>
 
 <script>
 const svg = document.getElementById("canvas");
@@ -39,17 +39,55 @@ let selected = null;
 let clipboard = null;
 let dragging = false;
 
+/* =========================
+   UNDO / REDO
+========================= */
+let history = [];
+let historyIndex = -1;
+
+function saveState() {
+  history = history.slice(0, historyIndex + 1);
+  history.push(svg.innerHTML);
+  historyIndex++;
+}
+
+function undo() {
+  if (historyIndex > 0) {
+    historyIndex--;
+    svg.innerHTML = history[historyIndex];
+    selected = null;
+  }
+}
+
+function redo() {
+  if (historyIndex < history.length - 1) {
+    historyIndex++;
+    svg.innerHTML = history[historyIndex];
+    selected = null;
+  }
+}
+
+saveState();
+
+/* =========================
+   TOOLS
+========================= */
 function setTool(t){ tool = t; }
 
 svg.addEventListener("mousedown", e => {
   startX = e.offsetX; startY = e.offsetY;
+
   if (tool === "select") {
     selectElement(e.target);
     dragging = selected && e.target === selected;
     return;
   }
+
   currentElement = createElement(tool, startX, startY);
-  if (currentElement) svg.appendChild(currentElement);
+  if (currentElement) {
+    svg.appendChild(currentElement);
+    saveState();
+  }
 });
 
 svg.addEventListener("mousemove", e => {
@@ -57,26 +95,25 @@ svg.addEventListener("mousemove", e => {
   const x = e.offsetX, y = e.offsetY;
 
   if (dragging && selected) {
-    selected.setAttribute("transform",
-      `translate(${x-startX},${y-startY})`);
+    selected.setAttribute("transform",`translate(${x-startX},${y-startY})`);
     return;
   }
 
   if (tool === "rect") {
-    currentElement.setAttribute("width", Math.abs(x-startX));
-    currentElement.setAttribute("height", Math.abs(y-startY));
     currentElement.setAttribute("x", Math.min(x,startX));
     currentElement.setAttribute("y", Math.min(y,startY));
+    currentElement.setAttribute("width", Math.abs(x-startX));
+    currentElement.setAttribute("height", Math.abs(y-startY));
   }
   if (tool === "line") {
     currentElement.setAttribute("x2", x);
     currentElement.setAttribute("y2", y);
   }
   if (tool === "ellipse") {
-    currentElement.setAttribute("rx", Math.abs(x-startX)/2);
-    currentElement.setAttribute("ry", Math.abs(y-startY)/2);
-    currentElement.setAttribute("cx", (x+startX)/2);
-    currentElement.setAttribute("cy", (y+startY)/2);
+    currentElement.setAttribute("cx",(x+startX)/2);
+    currentElement.setAttribute("cy",(y+startY)/2);
+    currentElement.setAttribute("rx",Math.abs(x-startX)/2);
+    currentElement.setAttribute("ry",Math.abs(y-startY)/2);
   }
   if (tool === "triangle") {
     currentElement.setAttribute("points",
@@ -89,44 +126,49 @@ svg.addEventListener("mouseup", () => {
   dragging = false;
 });
 
+/* =========================
+   ELEMENTS
+========================= */
 function createElement(type,x,y){
   let el;
-  switch(type){
-    case "rect":
-      el = document.createElementNS("http://www.w3.org/2000/svg","rect");
-      el.setAttribute("x",x); el.setAttribute("y",y);
-      el.setAttribute("fill","transparent");
-      el.setAttribute("stroke","black");
-      break;
-    case "line":
-      el = document.createElementNS("http://www.w3.org/2000/svg","line");
-      el.setAttribute("x1",x); el.setAttribute("y1",y);
-      el.setAttribute("x2",x); el.setAttribute("y2",y);
-      el.setAttribute("stroke","black");
-      break;
-    case "ellipse":
-      el = document.createElementNS("http://www.w3.org/2000/svg","ellipse");
-      el.setAttribute("fill","transparent");
-      el.setAttribute("stroke","black");
-      break;
-    case "triangle":
-      el = document.createElementNS("http://www.w3.org/2000/svg","polygon");
-      el.setAttribute("fill","transparent");
-      el.setAttribute("stroke","black");
-      break;
-    case "text":
-      const t = prompt("Texte :");
-      if (!t) return null;
-      el = document.createElementNS("http://www.w3.org/2000/svg","text");
-      el.setAttribute("x",x);
-      el.setAttribute("y",y);
-      el.textContent = t;
-      el.setAttribute("font-size","20");
-      break;
+  const ns = "http://www.w3.org/2000/svg";
+
+  if (type === "rect") {
+    el = document.createElementNS(ns,"rect");
+    el.setAttribute("fill","transparent");
+    el.setAttribute("stroke","black");
+  }
+  if (type === "line") {
+    el = document.createElementNS(ns,"line");
+    el.setAttribute("x1",x); el.setAttribute("y1",y);
+    el.setAttribute("x2",x); el.setAttribute("y2",y);
+    el.setAttribute("stroke","black");
+  }
+  if (type === "ellipse") {
+    el = document.createElementNS(ns,"ellipse");
+    el.setAttribute("fill","transparent");
+    el.setAttribute("stroke","black");
+  }
+  if (type === "triangle") {
+    el = document.createElementNS(ns,"polygon");
+    el.setAttribute("fill","transparent");
+    el.setAttribute("stroke","black");
+  }
+  if (type === "text") {
+    const txt = prompt("Texte :");
+    if (!txt) return null;
+    el = document.createElementNS(ns,"text");
+    el.setAttribute("x",x);
+    el.setAttribute("y",y);
+    el.textContent = txt;
+    el.setAttribute("font-size","20");
   }
   return el;
 }
 
+/* =========================
+   SELECTION / EDIT
+========================= */
 function selectElement(el){
   if (selected) selected.classList.remove("selected");
   if (el === svg) { selected=null; return; }
@@ -134,42 +176,57 @@ function selectElement(el){
   selected.classList.add("selected");
 }
 
-function copy(){
-  if (selected) clipboard = selected.cloneNode(true);
-}
-
+function copy(){ if (selected) clipboard = selected.cloneNode(true); }
 function paste(){
   if (!clipboard) return;
-  const clone = clipboard.cloneNode(true);
-  clone.classList.remove("selected");
-  svg.appendChild(clone);
+  const c = clipboard.cloneNode(true);
+  c.classList.remove("selected");
+  svg.appendChild(c);
+  saveState();
 }
-
 function cut(){
   if (!selected) return;
-  copy();
-  selected.remove();
-  selected=null;
+  copy(); deleteSelected();
 }
-
 function deleteSelected(){
-  if (selected){ selected.remove(); selected=null; }
+  if (selected){ selected.remove(); selected=null; saveState(); }
 }
 
+/* =========================
+   IMAGE
+========================= */
 function importImage(e){
-  const file = e.target.files[0];
   const reader = new FileReader();
   reader.onload = () => {
     const img = document.createElementNS("http://www.w3.org/2000/svg","image");
-    img.setAttributeNS(null,"href",reader.result);
+    img.setAttribute("href", reader.result);
     img.setAttribute("x",50);
     img.setAttribute("y",50);
     img.setAttribute("width",200);
     img.setAttribute("height",200);
     svg.appendChild(img);
+    saveState();
   };
-  reader.readAsDataURL(file);
+  reader.readAsDataURL(e.target.files[0]);
 }
+
+/* =========================
+   KEYBOARD SHORTCUTS
+========================= */
+document.addEventListener("keydown", e => {
+  if (!e.ctrlKey) return;
+
+  switch(e.key.toLowerCase()){
+    case "c": copy(); break;
+    case "v": paste(); break;
+    case "x": cut(); break;
+    case "z":
+      e.shiftKey ? redo() : undo();
+      break;
+    case "y": redo(); break;
+  }
+  if (e.key === "Delete") deleteSelected();
+});
 </script>
 
 </body>
