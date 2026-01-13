@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<title>Éditeur SVG</title>
+<style>
+body { font-family: Arial, sans-serif; margin: 0; display: flex; height: 100vh; }
+#tools { width: 180px; background:#f0f0f0; padding:10px; box-sizing:border-box; }
+#tools button, #tools input {
+  width: 100%; margin-bottom: 6px;
+}
+svg { flex: 1; border-left: 1px solid #ccc; cursor: crosshair; }
+.selected { stroke: red !important; stroke-width: 2 !important; }
+</style>
+</head>
+<body>
+
+<div id="tools">
+  <button onclick="setTool('select')">Sélectionner</button>
+  <button onclick="setTool('rect')">Rectangle</button>
+  <button onclick="setTool('line')">Ligne</button>
+  <button onclick="setTool('ellipse')">Ovale</button>
+  <button onclick="setTool('triangle')">Triangle</button>
+  <button onclick="setTool('text')">Texte</button>
+  <button onclick="copy()">Copier</button>
+  <button onclick="paste()">Coller</button>
+  <button onclick="cut()">Couper</button>
+  <button onclick="deleteSelected()">Supprimer</button>
+  <input type="file" accept="image/*" onchange="importImage(event)">
+</div>
+
+<svg id="canvas" width="100%" height="100%"></svg>
+
+<script>
+const svg = document.getElementById("canvas");
+let tool = "select";
+let startX, startY, currentElement = null;
+let selected = null;
+let clipboard = null;
+let dragging = false;
+
+function setTool(t){ tool = t; }
+
+svg.addEventListener("mousedown", e => {
+  startX = e.offsetX; startY = e.offsetY;
+  if (tool === "select") {
+    selectElement(e.target);
+    dragging = selected && e.target === selected;
+    return;
+  }
+  currentElement = createElement(tool, startX, startY);
+  if (currentElement) svg.appendChild(currentElement);
+});
+
+svg.addEventListener("mousemove", e => {
+  if (!currentElement && !dragging) return;
+  const x = e.offsetX, y = e.offsetY;
+
+  if (dragging && selected) {
+    selected.setAttribute("transform",
+      `translate(${x-startX},${y-startY})`);
+    return;
+  }
+
+  if (tool === "rect") {
+    currentElement.setAttribute("width", Math.abs(x-startX));
+    currentElement.setAttribute("height", Math.abs(y-startY));
+    currentElement.setAttribute("x", Math.min(x,startX));
+    currentElement.setAttribute("y", Math.min(y,startY));
+  }
+  if (tool === "line") {
+    currentElement.setAttribute("x2", x);
+    currentElement.setAttribute("y2", y);
+  }
+  if (tool === "ellipse") {
+    currentElement.setAttribute("rx", Math.abs(x-startX)/2);
+    currentElement.setAttribute("ry", Math.abs(y-startY)/2);
+    currentElement.setAttribute("cx", (x+startX)/2);
+    currentElement.setAttribute("cy", (y+startY)/2);
+  }
+  if (tool === "triangle") {
+    currentElement.setAttribute("points",
+      `${startX},${startY} ${x},${y} ${startX},${y}`);
+  }
+});
+
+svg.addEventListener("mouseup", () => {
+  currentElement = null;
+  dragging = false;
+});
+
+function createElement(type,x,y){
+  let el;
+  switch(type){
+    case "rect":
+      el = document.createElementNS("http://www.w3.org/2000/svg","rect");
+      el.setAttribute("x",x); el.setAttribute("y",y);
+      el.setAttribute("fill","transparent");
+      el.setAttribute("stroke","black");
+      break;
+    case "line":
+      el = document.createElementNS("http://www.w3.org/2000/svg","line");
+      el.setAttribute("x1",x); el.setAttribute("y1",y);
+      el.setAttribute("x2",x); el.setAttribute("y2",y);
+      el.setAttribute("stroke","black");
+      break;
+    case "ellipse":
+      el = document.createElementNS("http://www.w3.org/2000/svg","ellipse");
+      el.setAttribute("fill","transparent");
+      el.setAttribute("stroke","black");
+      break;
+    case "triangle":
+      el = document.createElementNS("http://www.w3.org/2000/svg","polygon");
+      el.setAttribute("fill","transparent");
+      el.setAttribute("stroke","black");
+      break;
+    case "text":
+      const t = prompt("Texte :");
+      if (!t) return null;
+      el = document.createElementNS("http://www.w3.org/2000/svg","text");
+      el.setAttribute("x",x);
+      el.setAttribute("y",y);
+      el.textContent = t;
+      el.setAttribute("font-size","20");
+      break;
+  }
+  return el;
+}
+
+function selectElement(el){
+  if (selected) selected.classList.remove("selected");
+  if (el === svg) { selected=null; return; }
+  selected = el;
+  selected.classList.add("selected");
+}
+
+function copy(){
+  if (selected) clipboard = selected.cloneNode(true);
+}
+
+function paste(){
+  if (!clipboard) return;
+  const clone = clipboard.cloneNode(true);
+  clone.classList.remove("selected");
+  svg.appendChild(clone);
+}
+
+function cut(){
+  if (!selected) return;
+  copy();
+  selected.remove();
+  selected=null;
+}
+
+function deleteSelected(){
+  if (selected){ selected.remove(); selected=null; }
+}
+
+function importImage(e){
+  const file = e.target.files[0];
+  const reader = new FileReader();
+  reader.onload = () => {
+    const img = document.createElementNS("http://www.w3.org/2000/svg","image");
+    img.setAttributeNS(null,"href",reader.result);
+    img.setAttribute("x",50);
+    img.setAttribute("y",50);
+    img.setAttribute("width",200);
+    img.setAttribute("height",200);
+    svg.appendChild(img);
+  };
+  reader.readAsDataURL(file);
+}
+</script>
+
+</body>
+</html>
