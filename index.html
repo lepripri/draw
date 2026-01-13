@@ -1,92 +1,81 @@
-<html lang="fr"><head>
+<!DOCTYPE html>
+<html lang="fr">
+<head>
 <meta charset="UTF-8">
-<title>Éditeur SVG Avancé</title>
+<title>Pripri – Dessin SVG</title>
+
 <style>
-body { margin:0; display:flex; height:100vh; font-family:Arial; }
-#tools { width:220px; background:#eee; padding:10px; }
-button {padding: 0px;}
-#tools button:not(.tools) { width:100%; margin-bottom:5px;}
-#canvas { flex:1; border-left:1px solid #aaa; cursor:crosshair; * {cursor: default;}}
-#toolsDiv {}
-.tools {width: 30px}
-.selected { stroke:red !important; }
-.handle { fill:white; stroke:black;}
-.rotate { fill:yellow; cursor:grab !important; }
+/* ===== STYLE PRIPRI ===== */
+html, body {
+  margin: 0;
+  padding: 0;
+  background-color: #fcb1e3;
+  font-family: Arial, sans-serif;
+  height: 100%;
+}
+
+body {
+  display: flex;
+}
+
+/* ===== BARRE OUTILS ===== */
+#tools {
+  width: 180px;
+  background: #fcb1e3;
+  border-right: 3px solid #ff0000;
+  padding: 6px;
+}
+
+#tools button {
+  width: 100%;
+  background: white;
+  border: 2px solid #ff0000;
+  margin-bottom: 4px;
+  padding: 4px;
+  cursor: pointer;
+}
+
+#tools button:hover {
+  background: #ffdddd;
+}
+
+/* ===== CANVAS ===== */
+#canvas {
+  flex: 1;
+  background: white;
+  border: 3px solid #ff0000;
+  cursor: crosshair;
+}
+
+/* ===== SVG ELEMENTS ===== */
+.selected {
+  stroke: #ff0000 !important;
+  stroke-width: 2;
+}
+
+.handle {
+  fill: white;
+  stroke: #ff0000;
+  stroke-width: 1.5;
+}
+
+.rotate {
+  fill: #ff0000;
+  cursor: grab;
+}
 </style>
 </head>
+
 <body>
 
-<div id="tools"><div id="toolsDiv">
-  <button class="tools" onclick="setTool('select')"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="20px" height="20px" viewBox="0 0 20 20" version="1.1">
-    
-    <title>curseur</title>
-    <desc>pointeur de souris noir</desc>
-    <defs></defs>
-    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-        <g id="select" fill="#575E75">
-            <path d="M9.08480709,12.7519131 L10.2692937,15.3910753 C10.5025281,15.912848 11.1105098,16.1432755 11.6267701,15.9075508 C12.1430304,15.6705018 12.3710236,15.0560284 12.1377892,14.53558 L10.9669627,11.925728 L13.925853,11.925728 C14.5130486,11.925728 14.7937693,11.2121948 14.3623865,10.8190495 L7.0791007,4.17004294 C6.6670336,3.7934914 6,4.08324462 6,4.63849857 L6,14.5028722 C6,15.0900373 6.73013138,15.3657496 7.12288282,14.9279287 L9.08480709,12.7519131 Z" id="select-icon"></path>
-        </g>
-    </g>
-</svg></button>
-  <button class="tools" onclick="setTool('rect')"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="20px" height="20px" viewBox="0 0 20 20" version="1.1">
-    
-    <title>rectangle</title>
-    <desc>créez des réctangles : outils de réctangles</desc>
-    <defs></defs>
-    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" stroke-linecap="round" stroke-linejoin="round">
-        <g id="rectangle" stroke="#575E75" stroke-width="1.5">
-            <rect id="rectangle-icon" x="5" y="5" width="10" height="10"></rect>
-        </g>
-    </g>
-</svg></button>
-  <button class="tools" onclick="setTool('ellipse')"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="20px" height="20px" viewBox="0 0 20 20" version="1.1">
-    
-    <title>oval</title>
-    <desc>créez des ovals</desc>
-    <defs></defs>
-    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-        <g id="oval" stroke-width="1.5" stroke="#575E75">
-            <circle id="oval-icon" cx="10" cy="10" r="5"></circle>
-        </g>
-    </g>
-</svg></button>
-  <button class="tools" onclick="setTool('line')"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="20px" height="20px" viewBox="0 0 20 20" version="1.1">
-    
-    <title>ligne</title>
-    <desc>outil ligne : créez des lignes</desc>
-    <defs></defs>
-    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" stroke-linecap="square">
-        <g id="line" stroke="#575E75" stroke-width="2">
-            <path d="M5,15 L15,5" id="Line"></path>
-        </g>
-    </g>
-</svg></button>
-  <button class="tools" onclick="setTool('triangle')"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" width="11.5" height="20" viewBox="0,0,11.5,11.5"><title>trangle</title><desc>outil trangle : créez des triangles</desc><defs></defs><g transform="translate(-234.25,-174.25)"><g fill="none" fill-rule="evenodd" stroke="#575e75" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10"><path d="M235,185l5.01683,-10l4.98317,10z"></path></g></g></svg></button>
-  <button class="tools" onclick="setTool('text')"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="20px" height="20px" viewBox="0 0 20 20" version="1.1">
-    <!-- Generator: Sketch 43.2 (39069) - http://www.bohemiancoding.com/sketch -->
-    <title>text</title>
-    <desc>text tool : create and edit text</desc>
-    <defs></defs>
-    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-        <g id="text" fill="#575E75">
-            <path d="M16,4.35294118 L16,6.85176471 C16,7.04941176 15.8447059,7.20470588 15.6470588,7.20470588 L14.8988235,7.20470588 C14.7576471,7.20470588 14.6164706,7.12 14.5741176,6.99294118 L14.2070588,6.11764706 L11.0588235,6.11764706 L11.0588235,14.2917647 L11.92,14.6164706 C12.0611765,14.6729412 12.16,14.8 12.16,14.9552941 L12.16,15.6470588 C12.16,15.8447059 11.9905882,16 11.8070588,16 L8.20705882,16 C8.02352941,16 7.85411765,15.8447059 7.85411765,15.6470588 L7.85411765,14.9552941 C7.85411765,14.8 7.95294118,14.6729412 8.08,14.6164706 L8.94117647,14.2917647 L8.94117647,6.11764706 L5.80705882,6.11764706 L5.44,6.99294118 C5.38352941,7.12 5.25647059,7.20470588 5.11529412,7.20470588 L4.35294118,7.20470588 C4.16941176,7.20470588 4,7.04941176 4,6.85176471 L4,4.35294118 C4,4.15529412 4.16941176,4 4.35294118,4 L15.6470588,4 C15.8447059,4 16,4.15529412 16,4.35294118" id="text-icon"></path>
-        </g>
-    </g>
-</svg></button></div>
+<div id="tools">
+  <button onclick="setTool('select')">🖱 Sélection</button>
+  <button onclick="setTool('rect')">⬛ Rectangle</button>
+  <button onclick="setTool('ellipse')">⚪ Ellipse</button>
+  <button onclick="setTool('line')">📏 Ligne</button>
+  <button onclick="setTool('text')">✏ Texte</button>
   <hr>
-  <button onclick="exportSVG()">Exporter SVG</button>
-  <button onclick="exportPNG()">Convertir en Bitmap</button>
-<hr>
-<div id="textTools" style="display:none">
-  <input type="color" onchange="setTextColor(this.value)">
-  <input type="number" min="6" max="200" value="16" onchange="setTextSize(this.value)">
-  <select onchange="setTextFont(this.value)">
-    <option>Arial</option>
-    <option>Verdana</option>
-    <option>Times New Roman</option>
-    <option>Courier New</option>
-  </select>
-</div>
+  <button onclick="exportSVG()">💾 Export SVG</button>
 </div>
 
 <svg id="canvas"></svg>
@@ -94,472 +83,209 @@ button {padding: 0px;}
 <script>
 const svg = document.getElementById("canvas");
 const ns = "http://www.w3.org/2000/svg";
-let tool="select", current=null, selected=null;
-let startX,startY;
-let handles=[];
-let undoStack = [];
-let redoStack = [];
-const MAX_HISTORY = 50;
-let mouseX = 0, mouseY = 0;
+
+let tool = "select";
+let current = null;
+let selected = null;
+let startX = 0, startY = 0;
+let handles = [];
+
+/* ===== TOOLS ===== */
+function setTool(t) {
+  tool = t;
+  removeHandles();
+}
+
+/* ===== DRAW ===== */
+svg.addEventListener("mousedown", e => {
+  startX = e.offsetX;
+  startY = e.offsetY;
+
+  if (tool === "select") {
+    select(e.target);
+    return;
+  }
+
+  current = create(tool, startX, startY);
+  if (current) svg.appendChild(current);
+});
+
 svg.addEventListener("mousemove", e => {
-  mouseX = e.offsetX;
-  mouseY = e.offsetY;
-});
+  if (!current) return;
 
-/* ===================== TOOLS ===================== */
-function setTool(t){ tool=t; removeHandles(); }
+  const x = e.offsetX;
+  const y = e.offsetY;
 
-/* ================== UNDO / REDO ================== */
-function saveState() {
-  undoStack.push(svg.innerHTML);
-
-  if (undoStack.length > MAX_HISTORY) {
-    undoStack.shift();
+  if (current.tagName === "rect") {
+    current.setAttribute("x", Math.min(x, startX));
+    current.setAttribute("y", Math.min(y, startY));
+    current.setAttribute("width", Math.abs(x - startX));
+    current.setAttribute("height", Math.abs(y - startY));
   }
 
-  redoStack.length = 0; // reset redo
-}
-function undo() {
-  if (undoStack.length === 0) return;
-
-  redoStack.push(svg.innerHTML);
-  svg.innerHTML = undoStack.pop();
-
-  removeHandles();
-  selected = null;
-}
-
-function redo() {
-  if (redoStack.length === 0) return;
-
-  undoStack.push(svg.innerHTML);
-  svg.innerHTML = redoStack.pop();
-
-  removeHandles();
-  selected = null;
-}
-document.addEventListener("keydown", e => {
-  if (!e.ctrlKey) return;
-
-  if (e.key.toLowerCase() === "z" && !e.shiftKey) {
-    e.preventDefault();
-    undo();
+  if (current.tagName === "ellipse") {
+    current.setAttribute("cx", (x + startX) / 2);
+    current.setAttribute("cy", (y + startY) / 2);
+    current.setAttribute("rx", Math.abs(x - startX) / 2);
+    current.setAttribute("ry", Math.abs(y - startY) / 2);
   }
 
-  if (
-    e.key.toLowerCase() === "y" ||
-    (e.key.toLowerCase() === "z" && e.shiftKey)
-  ) {
-    e.preventDefault();
-    redo();
+  if (current.tagName === "line") {
+    current.setAttribute("x2", x);
+    current.setAttribute("y2", y);
   }
 });
 
-/* ===================== DRAW ===================== */
-function insertImage(dataURL) {
-  saveState();
+svg.addEventListener("mouseup", () => current = null);
 
-  const img = document.createElementNS(ns, "image");
-  img.setAttributeNS(null, "href", dataURL);
-  img.setAttribute("x", 50);
-  img.setAttribute("y", 50);
-  img.setAttribute("width", 200);
-  img.setAttribute("height", 200);
-  img.setAttribute("x", mouseX - 100);
-  img.setAttribute("y", mouseY - 100);
-  svg.appendChild(img);
-  select(img);
-}
-function resizeText(e) {
-  e.stopPropagation();
-
-  let startY = e.offsetY;
-  let size = parseFloat(getComputedStyle(selected).fontSize) || 16;
-
-  svg.onmousemove = ev => {
-    let dy = startY - ev.offsetY;
-    let newSize = Math.max(6, size + dy * 0.3);
-
-    selected.setAttribute("font-size", newSize);
-    updateHandlesLive();
-  };
-
-  svg.onmouseup = () => svg.onmousemove = null;
-}
-svg.onmousemove = ev => {
-  let x = ev.offsetX;
-  let y = ev.offsetY;
-
-  let w = Math.abs(x - origin[0]);
-  let h = Math.abs(y - origin[1]);
-
-  if (isEllipse) {
-    selected.setAttribute("rx", w / 2);
-    selected.setAttribute("ry", h / 2);
-    selected.setAttribute("cx", origin[0] + w / 2);
-    selected.setAttribute("cy", origin[1] + h / 2);
-  } else {
-    selected.setAttribute("x", Math.min(x, origin[0]));
-    selected.setAttribute("y", Math.min(y, origin[1]));
-    selected.setAttribute("width", w);
-    selected.setAttribute("height", h);
-  }
-
-  // 🔥 NOUVEAU : mise à jour live des poignées
-  saveState();
-  updateHandlesLive();
-};
-
-function resizeLine(e, attr) {
-  e.stopPropagation();
-
-  const x0 = parseFloat(selected.getAttribute(attr[0]));
-  const y0 = parseFloat(selected.getAttribute(attr[1]));
-
-  svg.onmousemove = ev => {
-    let x = ev.offsetX;
-    let y = ev.offsetY;
-
-    // Shift = angle contraint
-    if (ev.shiftKey) {
-      let dx = x - x0;
-      let dy = y - y0;
-      if (Math.abs(dx) > Math.abs(dy)) y = y0;
-      else x = x0;
-    }
-
-    selected.setAttribute(attr[0], x);
-    selected.setAttribute(attr[1], y);
-
-    updateHandlesLive();
-  };
-  saveState();
-  svg.onmouseup = () => svg.onmousemove = null;
-}
-
-
-svg.onmouseup = () => {
-  svg.onmousemove = null;
-};
-
-
-function updateHandlesLive(){
-  removeHandles();
-  createHandles();
-}
-
-function create(t,x,y){
+/* ===== CREATE ===== */
+function create(t, x, y) {
   let e;
-  if(t==="rect"){ e=document.createElementNS(ns,"rect"); e.setAttribute("fill","none"); e.setAttribute("stroke","black"); }
-  if(t==="ellipse"){ e=document.createElementNS(ns,"ellipse"); e.setAttribute("fill","none"); e.setAttribute("stroke","black"); }
-  if(t==="line"){ e=document.createElementNS(ns,"line"); e.setAttribute("x1",x);e.setAttribute("y1",y);e.setAttribute("x2",x);e.setAttribute("y2",y);e.setAttribute("stroke","black"); }
-  if(t==="triangle"){ e=document.createElementNS(ns,"polygon"); e.setAttribute("stroke","black"); e.setAttribute("fill","none"); }
-  if(t==="text"){
-    let txt=prompt("Texte");
-    if(!txt) return null;
-    e=document.createElementNS(ns,"text");
-    e.setAttribute("x",x); e.setAttribute("y",y);
-    e.textContent=txt;
+
+  if (t === "rect") {
+    e = document.createElementNS(ns, "rect");
+    e.setAttribute("fill", "none");
+    e.setAttribute("stroke", "black");
   }
-  saveState();
+
+  if (t === "ellipse") {
+    e = document.createElementNS(ns, "ellipse");
+    e.setAttribute("fill", "none");
+    e.setAttribute("stroke", "black");
+  }
+
+  if (t === "line") {
+    e = document.createElementNS(ns, "line");
+    e.setAttribute("x1", x);
+    e.setAttribute("y1", y);
+    e.setAttribute("x2", x);
+    e.setAttribute("y2", y);
+    e.setAttribute("stroke", "black");
+  }
+
+  if (t === "text") {
+    const txt = prompt("Texte Pripri ?");
+    if (!txt) return null;
+    e = document.createElementNS(ns, "text");
+    e.setAttribute("x", x);
+    e.setAttribute("y", y);
+    e.textContent = txt;
+  }
+
   return e;
 }
 
-/* ===================== SELECTION ===================== */
-function setTextColor(c){
-  if(selected?.tagName==="text")
-    selected.setAttribute("fill", c);saveState();
-}
-
-function setTextSize(s){
-  if(selected?.tagName==="text")
-    selected.setAttribute("font-size", s);saveState();
-}
-
-function setTextFont(f){
-  if(selected?.tagName==="text")
-    selected.setAttribute("font-family", f);saveState();
-}
-
-function select(el){
-  if(el===svg) return;
-  if(el.classList.contains("handle") || el.classList.contains("rotate")) return;
-  if(selected) selected.classList.remove("selected");
-  selected=el;
+/* ===== SELECTION ===== */
+function select(el) {
+  if (el === svg) return;
+  if (selected) selected.classList.remove("selected");
+  selected = el;
   selected.classList.add("selected");
-  document.getElementById("textTools").style.display =
-  selected.tagName === "text" ? "block" : "none";
   createHandles();
 }
 
-/* ===================== HANDLES ===================== */
-function createHandles(){
+/* ===== HANDLES ===== */
+function createHandles() {
   removeHandles();
-  if(!selected.getBBox) return;
-  let b=selected.getBBox();
-  let pts=[
-    [b.x,b.y],[b.x+b.width,b.y],
-    [b.x,b.y+b.height],[b.x+b.width,b.y+b.height]
+  if (!selected.getBBox) return;
+
+  const b = selected.getBBox();
+  const pts = [
+    [b.x, b.y],
+    [b.x + b.width, b.y],
+    [b.x, b.y + b.height],
+    [b.x + b.width, b.y + b.height]
   ];
-  const cursors = ["nw-resize","ne-resize","sw-resize","se-resize"];
-  pts.forEach((p,i)=>{
-    let h=document.createElementNS(ns,"rect");
-    h.setAttribute("x",p[0]-4);
-    h.setAttribute("y",p[1]-4);
-    h.setAttribute("width",8);
-    h.setAttribute("height",8);
-    h.style.cursor = cursors[i];
+
+  pts.forEach(p => {
+    const h = document.createElementNS(ns, "rect");
+    h.setAttribute("x", p[0] - 4);
+    h.setAttribute("y", p[1] - 4);
+    h.setAttribute("width", 8);
+    h.setAttribute("height", 8);
     h.classList.add("handle");
-    h.onmousedown=e=>resize(e,p);
+    h.onmousedown = ev => resize(ev, p);
     svg.appendChild(h);
     handles.push(h);
   });
 
-  // rotation
-  let r=document.createElementNS(ns,"circle");
-  r.setAttribute("cx",b.x+b.width/2);
-  r.setAttribute("cy",b.y-20);
-  r.setAttribute("r",6);
+  const r = document.createElementNS(ns, "circle");
+  r.setAttribute("cx", b.x + b.width / 2);
+  r.setAttribute("cy", b.y - 20);
+  r.setAttribute("r", 6);
   r.classList.add("rotate");
-  r.onmousedown=startRotate;
+  r.onmousedown = startRotate;
   svg.appendChild(r);
   handles.push(r);
-if (selected.tagName === "line") {
-  const pts = [
-    ["x1","y1"],
-    ["x2","y2"]
-  ];
-
-  pts.forEach((p, i) => {
-    let h = document.createElementNS(ns, "circle");
-    h.setAttribute("r", 6);
-    h.setAttribute("cx", selected.getAttribute(p[0]));
-    h.setAttribute("cy", selected.getAttribute(p[1]));
-    h.classList.add("handle");
-    h.style.cursor = "move";
-
-    h.onmousedown = e => resizeLine(e, p);
-    svg.appendChild(h);
-    handles.push(h);
-  });
-  return;
-}
-  if (selected.tagName === "polygon") {
-  const pts = selected.points;
-
-  for (let i = 0; i < pts.numberOfItems; i++) {
-    let p = pts.getItem(i);
-
-    let h = document.createElementNS(ns, "circle");
-    h.setAttribute("cx", p.x);
-    h.setAttribute("cy", p.y);
-    h.setAttribute("r", 6);
-    h.classList.add("handle");
-    h.style.cursor = "move";
-
-    h.onmousedown = e => resizePolygon(e, i);
-    svg.appendChild(h);
-    handles.push(h);
-  }
-  return;
-}
-if (selected.tagName === "text") {
-  const box = selected.getBBox();
-
-  let h = document.createElementNS(ns, "rect");
-  h.setAttribute("x", box.x + box.width);
-  h.setAttribute("y", box.y + box.height);
-  h.setAttribute("width", 8);
-  h.setAttribute("height", 8);
-  h.classList.add("handle");
-  h.style.cursor = "nwse-resize";
-
-  h.onmousedown = resizeText;
-  svg.appendChild(h);
-  handles.push(h);
-  return;
-}
 }
 
-function removeHandles(){ handles.forEach(h=>h.remove()); handles=[]; }
+function removeHandles() {
+  handles.forEach(h => h.remove());
+  handles = [];
+}
 
-/* ===================== RESIZE ===================== */
+/* ===== RESIZE ===== */
 function resize(e, origin) {
   e.stopPropagation();
 
-  const box = selected.getBBox();
-  const tag = selected.tagName;
-  const isEllipse = tag === "ellipse";
-
-  const startBox = {
-    x: box.x,
-    y: box.y,
-    w: box.width,
-    h: box.height,
-    cx: box.x + box.width / 2,
-    cy: box.y + box.height / 2,
-    ratio: box.width / box.height || 1
-  };
+  const isEllipse = selected.tagName === "ellipse";
 
   svg.onmousemove = ev => {
-    let x = ev.offsetX;
-    let y = ev.offsetY;
+    const x = ev.offsetX;
+    const y = ev.offsetY;
 
-    let dx = x - origin[0];
-    let dy = y - origin[1];
-
-    let w = Math.abs(dx);
-    let h = Math.abs(dy);
-
-    // ↔️ SHIFT : proportionnel
-    if (ev.shiftKey) {
-      if (w / h > startBox.ratio) {
-        w = h * startBox.ratio;
-      } else {
-        h = w / startBox.ratio;
-      }
-    }
-
-    let newX = Math.min(x, origin[0]);
-    let newY = Math.min(y, origin[1]);
-
-    // 🎯 ALT : depuis le centre
-    if (ev.altKey) {
-      newX = startBox.cx - w;
-      newY = startBox.cy - h;
-      w *= 2;
-      h *= 2;
-    }
+    const w = Math.abs(x - origin[0]);
+    const h = Math.abs(y - origin[1]);
 
     if (isEllipse) {
-      selected.setAttribute("cx", newX + w / 2);
-      selected.setAttribute("cy", newY + h / 2);
       selected.setAttribute("rx", w / 2);
       selected.setAttribute("ry", h / 2);
+      selected.setAttribute("cx", origin[0] + w / 2);
+      selected.setAttribute("cy", origin[1] + h / 2);
     } else {
-      selected.setAttribute("x", newX);
-      selected.setAttribute("y", newY);
+      selected.setAttribute("x", Math.min(x, origin[0]));
+      selected.setAttribute("y", Math.min(y, origin[1]));
       selected.setAttribute("width", w);
       selected.setAttribute("height", h);
     }
-
-    // 🔄 poignées dynamiques
-    updateHandlesLive();
   };
 
   svg.onmouseup = () => {
     svg.onmousemove = null;
+    createHandles();
   };
-  saveState();
 }
 
-/* ===================== ROTATE ===================== */
-function startRotate(e){
+/* ===== ROTATE ===== */
+function startRotate(e) {
   e.stopPropagation();
-  let box=selected.getBBox();
-  let cx=box.x+box.width/2;
-  let cy=box.y+box.height/2;
-  svg.onmousemove=ev=>{
-    let a=Math.atan2(ev.offsetY-cy,ev.offsetX-cx)*180/Math.PI;
-    selected.setAttribute("transform",`rotate(${a} ${cx} ${cy})`);
-  };
-  svg.onmouseup=()=>{ svg.onmousemove=null; };
-  function resizePolygon(e, index) {
-  e.stopPropagation();
+  const b = selected.getBBox();
+  const cx = b.x + b.width / 2;
+  const cy = b.y + b.height / 2;
 
   svg.onmousemove = ev => {
-    let p = selected.points.getItem(index);
-    p.x = ev.offsetX;
-    p.y = ev.offsetY;
-
-    updateHandlesLive();
+    const a = Math.atan2(ev.offsetY - cy, ev.offsetX - cx) * 180 / Math.PI;
+    selected.setAttribute("transform", `rotate(${a} ${cx} ${cy})`);
   };
 
   svg.onmouseup = () => svg.onmousemove = null;
 }
-saveState();
-}
 
-/* ===================== KEYBOARD MOVE ===================== */
-document.onkeydown = e => {
-  if (!selected) return;
-
-  let step = e.shiftKey ? 10 : 1;
-  let dx = 0, dy = 0;
-
-  if (e.key === "ArrowLeft") dx = -step;
-  if (e.key === "ArrowRight") dx = step;
-  if (e.key === "ArrowUp") dy = -step;
-  if (e.key === "ArrowDown") dy = step;
-  if (!dx && !dy) return;
-
-  e.preventDefault();
-
-  let t = selected.getAttribute("transform") || "";
-  let box = selected.getBBox();
-  selected.setAttribute(
-    "transform",
-    `translate(${dx},${dy})`
-  );
-  selected.setAttribute("transform", t);
-
-  createHandles();
-  saveState();
-};
-
-/* ===================== EXPORT SVG ===================== */
+/* ===== EXPORT ===== */
 function exportSVG() {
   removeHandles();
-  let clone = svg.cloneNode(true);
-  let blob = new Blob([clone.outerHTML], { type: "image/svg+xml" });
-  download(blob, "dessin.svg");
+  const blob = new Blob([svg.outerHTML], { type: "image/svg+xml" });
+  download(blob, "pripri.svg");
   createHandles();
 }
 
-/* ===================== EXPORT PNG ===================== */
-function exportPNG(){
-  let img=new Image();
-  let data="data:image/svg+xml;base64,"+btoa(svg.outerHTML);
-  img.onload=()=>{
-    let c=document.createElement("canvas");
-    c.width=svg.clientWidth;
-    c.height=svg.clientHeight;
-    c.getContext("2d").drawImage(img,0,0);
-    c.toBlob(b=>download(b,"dessin.png"));
-  };
-  img.src=data;
-}
-
-/* ===================== UTIL ===================== */
-function download(blob,name){
-  let a=document.createElement("a");
-  a.href=URL.createObjectURL(blob);
-  a.download=name;
+function download(blob, name) {
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = name;
   a.click();
 }
-function handlePaste(e) {
-  const items = e.clipboardData?.items;
-  if (!items) return;
-
-  for (let item of items) {
-    if (item.type.startsWith("image/")) {
-      e.preventDefault();
-
-      const file = item.getAsFile();
-      const reader = new FileReader();
-
-      reader.onload = ev => {
-        insertImage(ev.target.result);
-      };
-
-      reader.readAsDataURL(file);
-      break;
-    }
-  }
-}
-document.addEventListener("paste", handlePaste);
 </script>
 
-
-
-</body></html>
+</body>
+</html>
