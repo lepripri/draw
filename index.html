@@ -112,6 +112,18 @@ svg.onmousemove = e => {
     current.setAttribute("rx",Math.abs(x-startX)/2);
     current.setAttribute("ry",Math.abs(y-startY)/2);
   }
+  if(tool==="line"){
+    current.setAttribute("x2",x);
+    current.setAttribute("y2",y);
+  }
+  
+  if(tool==="triangle"){
+    current.setAttribute("points",`
+      ${startX},${startY}
+      ${x},${y}
+      ${startX},${y}
+    `);
+  }
 };
 svg.onmouseup=()=>current=null;
 
