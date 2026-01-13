@@ -1,14 +1,14 @@
 <!DOCTYPE html>
-<html lang="fr">
-<head>
+<html lang="fr"><head>
 <meta charset="UTF-8">
 <title>Éditeur SVG Avancé</title>
 <style>
 body { margin:0; display:flex; height:100vh; font-family:Arial; }
 #tools { width:220px; background:#eee; padding:10px; }
-#tools button { width:100%; margin-bottom:5px; }
+#tools button:not(.tools) { width:100%; margin-bottom:5px; }
 svg { flex:1; border-left:1px solid #aaa; cursor:crosshair; }
-
+#toolsDiv {}
+.tools {width: 30px}
 .selected { stroke:red !important; }
 .handle { fill:white; stroke:black;}
 .rotate { fill:yellow; cursor:grab; }
@@ -16,19 +16,69 @@ svg { flex:1; border-left:1px solid #aaa; cursor:crosshair; }
 </head>
 <body>
 
-<div id="tools">
-  <button onclick="setTool('select')">Sélection</button>
-  <button onclick="setTool('rect')">Rectangle</button>
-  <button onclick="setTool('ellipse')">Ovale</button>
-  <button onclick="setTool('line')">Ligne</button>
-  <button onclick="setTool('triangle')">Triangle</button>
-  <button onclick="setTool('text')">Texte</button>
+<div id="tools"><div id="toolsDiv">
+  <button class="tools" onclick="setTool('select')"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="20px" height="20px" viewBox="0 0 20 20" version="1.1">
+    <!-- Generator: Sketch 43.2 (39069) - http://www.bohemiancoding.com/sketch -->
+    <title>select</title>
+    <desc>Created with Sketch.</desc>
+    <defs></defs>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="select" fill="#575E75">
+            <path d="M9.08480709,12.7519131 L10.2692937,15.3910753 C10.5025281,15.912848 11.1105098,16.1432755 11.6267701,15.9075508 C12.1430304,15.6705018 12.3710236,15.0560284 12.1377892,14.53558 L10.9669627,11.925728 L13.925853,11.925728 C14.5130486,11.925728 14.7937693,11.2121948 14.3623865,10.8190495 L7.0791007,4.17004294 C6.6670336,3.7934914 6,4.08324462 6,4.63849857 L6,14.5028722 C6,15.0900373 6.73013138,15.3657496 7.12288282,14.9279287 L9.08480709,12.7519131 Z" id="select-icon"></path>
+        </g>
+    </g>
+</svg></button>
+  <button class="tools" onclick="setTool('rect')"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="20px" height="20px" viewBox="0 0 20 20" version="1.1">
+    <!-- Generator: Sketch 43.2 (39069) - http://www.bohemiancoding.com/sketch -->
+    <title>rectangle</title>
+    <desc>Created with Sketch.</desc>
+    <defs></defs>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" stroke-linecap="round" stroke-linejoin="round">
+        <g id="rectangle" stroke="#575E75" stroke-width="1.5">
+            <rect id="rectangle-icon" x="5" y="5" width="10" height="10"></rect>
+        </g>
+    </g>
+</svg></button>
+  <button class="tools" onclick="setTool('ellipse')"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="20px" height="20px" viewBox="0 0 20 20" version="1.1">
+    <!-- Generator: Sketch 43.2 (39069) - http://www.bohemiancoding.com/sketch -->
+    <title>oval</title>
+    <desc>Created with Sketch.</desc>
+    <defs></defs>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="oval" stroke-width="1.5" stroke="#575E75">
+            <circle id="oval-icon" cx="10" cy="10" r="5"></circle>
+        </g>
+    </g>
+</svg></button>
+  <button class="tools" onclick="setTool('line')"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="20px" height="20px" viewBox="0 0 20 20" version="1.1">
+    <!-- Generator: Sketch 43.2 (39069) - http://www.bohemiancoding.com/sketch -->
+    <title>line</title>
+    <desc>Created with Sketch.</desc>
+    <defs></defs>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" stroke-linecap="square">
+        <g id="line" stroke="#575E75" stroke-width="2">
+            <path d="M5,15 L15,5" id="Line"></path>
+        </g>
+    </g>
+</svg></button>
+  <button class="tools" onclick="setTool('triangle')">Triangle</button>
+  <button class="tools" onclick="setTool('text')"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="20px" height="20px" viewBox="0 0 20 20" version="1.1">
+    <!-- Generator: Sketch 43.2 (39069) - http://www.bohemiancoding.com/sketch -->
+    <title>text</title>
+    <desc>Created with Sketch.</desc>
+    <defs></defs>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="text" fill="#575E75">
+            <path d="M16,4.35294118 L16,6.85176471 C16,7.04941176 15.8447059,7.20470588 15.6470588,7.20470588 L14.8988235,7.20470588 C14.7576471,7.20470588 14.6164706,7.12 14.5741176,6.99294118 L14.2070588,6.11764706 L11.0588235,6.11764706 L11.0588235,14.2917647 L11.92,14.6164706 C12.0611765,14.6729412 12.16,14.8 12.16,14.9552941 L12.16,15.6470588 C12.16,15.8447059 11.9905882,16 11.8070588,16 L8.20705882,16 C8.02352941,16 7.85411765,15.8447059 7.85411765,15.6470588 L7.85411765,14.9552941 C7.85411765,14.8 7.95294118,14.6729412 8.08,14.6164706 L8.94117647,14.2917647 L8.94117647,6.11764706 L5.80705882,6.11764706 L5.44,6.99294118 C5.38352941,7.12 5.25647059,7.20470588 5.11529412,7.20470588 L4.35294118,7.20470588 C4.16941176,7.20470588 4,7.04941176 4,6.85176471 L4,4.35294118 C4,4.15529412 4.16941176,4 4.35294118,4 L15.6470588,4 C15.8447059,4 16,4.15529412 16,4.35294118" id="text-icon"></path>
+        </g>
+    </g>
+</svg></button></div>
   <hr>
   <button onclick="exportSVG()">Exporter SVG</button>
   <button onclick="exportPNG()">Convertir en Bitmap</button>
 </div>
 
-<svg id="canvas"></svg>
+<svg id="canvas"><rect fill="none" stroke="black" x="54" y="86" width="337" height="252"></rect><ellipse fill="none" stroke="black" cx="475.5" cy="438.5" rx="103.5" ry="104.5" class="selected"></ellipse><rect x="368" y="330" width="8" height="8" class="handle" style="cursor: nw-resize;"></rect><rect x="575" y="330" width="8" height="8" class="handle" style="cursor: ne-resize;"></rect><rect x="368" y="538.9999847412109" width="8" height="8" class="handle" style="cursor: sw-resize;"></rect><rect x="575" y="538.9999847412109" width="8" height="8" class="handle" style="cursor: se-resize;"></rect><circle cx="475.5" cy="314" r="6" class="rotate"></circle></svg>
 
 <script>
 const svg = document.getElementById("canvas");
@@ -225,5 +275,6 @@ function download(blob,name){
   a.click();
 }
 </script>
-</body>
-</html>
+
+
+</body></html>
