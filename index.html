@@ -91,41 +91,38 @@ let handles=[];
 function setTool(t){ tool=t; removeHandles(); }
 
 /* ===================== DRAW ===================== */
-svg.onmousedown = e => {
-  startX=e.offsetX; startY=e.offsetY;
-  if(tool==="select"){ select(e.target); return; }
-  current=create(tool,startX,startY);
-  if(current) svg.appendChild(current);
+svg.onmousemove = ev => {
+  let x = ev.offsetX;
+  let y = ev.offsetY;
+
+  let w = Math.abs(x - origin[0]);
+  let h = Math.abs(y - origin[1]);
+
+  if (isEllipse) {
+    selected.setAttribute("rx", w / 2);
+    selected.setAttribute("ry", h / 2);
+    selected.setAttribute("cx", origin[0] + w / 2);
+    selected.setAttribute("cy", origin[1] + h / 2);
+  } else {
+    selected.setAttribute("x", Math.min(x, origin[0]));
+    selected.setAttribute("y", Math.min(y, origin[1]));
+    selected.setAttribute("width", w);
+    selected.setAttribute("height", h);
+  }
+
+  // 🔥 NOUVEAU : mise à jour live des poignées
+  updateHandlesLive();
 };
-svg.onmousemove = e => {
-  if(!current) return;
-  let x=e.offsetX,y=e.offsetY;
-  if(tool==="rect"){
-    current.setAttribute("x",Math.min(x,startX));
-    current.setAttribute("y",Math.min(y,startY));
-    current.setAttribute("width",Math.abs(x-startX));
-    current.setAttribute("height",Math.abs(y-startY));
-  }
-  if(tool==="ellipse"){
-    current.setAttribute("cx",(x+startX)/2);
-    current.setAttribute("cy",(y+startY)/2);
-    current.setAttribute("rx",Math.abs(x-startX)/2);
-    current.setAttribute("ry",Math.abs(y-startY)/2);
-  }
-  if(tool==="line"){
-    current.setAttribute("x2",x);
-    current.setAttribute("y2",y);
-  }
-  
-  if(tool==="triangle"){
-    current.setAttribute("points",`
-      ${startX},${startY}
-      ${x},${y}
-      ${startX},${y}
-    `);
-  }
+
+svg.onmouseup = () => {
+  svg.onmousemove = null;
 };
-svg.onmouseup=()=>current=null;
+
+
+function updateHandlesLive(){
+  removeHandles();
+  createHandles();
+}
 
 function create(t,x,y){
   let e;
