@@ -344,7 +344,7 @@ function startRotate(e) {
 function exportSVG() {
   removeHandles();
   const blob = new Blob([svg.outerHTML], { type: "image/svg+xml" });
-  download(blob, `{new Date().toLocaleDateString().replaceAll("/", "-")} Nouveau Dessin SVG.svg`);
+  download(blob, `${new Date().toLocaleDateString().replaceAll("/", "-")} Nouveau Dessin SVG.svg`);
   createHandles();
 }
 
