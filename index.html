@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="fr"><head>
 <meta charset="UTF-8">
-<title>Nouveau Dessin SVG – le pripri draw</title>
+<title>Nouveau dessin</title>
 
 <style>
 /* ===== STYLE PRIPRI ===== */
@@ -11,9 +11,10 @@ html, body {
   background-color: #fcb1e3;
   font-family: Arial, sans-serif;
   height: 100%;
+  overflow: hidden;
 }
 
-body {
+[flex] {
   display: flex;
 }
 
@@ -107,13 +108,13 @@ body {
     content: "";
     background-image: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiIHN0YW5kYWxvbmU9Im5vIj8+Cjxzdmcgd2lkdGg9IjIwcHgiIGhlaWdodD0iMjBweCIgdmlld0JveD0iMCAwIDIwIDIwIiB2ZXJzaW9uPSIxLjEiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiPgogICAgPCEtLSBHZW5lcmF0b3I6IFNrZXRjaCA0OC4xICg0NzI1MCkgLSBodHRwOi8vd3d3LmJvaGVtaWFuY29kaW5nLmNvbS9za2V0Y2ggLS0+CiAgICA8dGl0bGU+ZmlsbDwvdGl0bGU+CiAgICA8ZGVzYz5DcmVhdGVkIHdpdGggU2tldGNoLjwvZGVzYz4KICAgIDxkZWZzPjwvZGVmcz4KICAgIDxnIGlkPSJQYWdlLTEiIHN0cm9rZT0ibm9uZSIgc3Ryb2tlLXdpZHRoPSIxIiBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPgogICAgICAgIDxnIGlkPSJmaWxsIiBmaWxsPSIjNTc1RTc1Ij4KICAgICAgICAgICAgPHBhdGggZD0iTTE0LjA0NTA5NjksOS42OTM0OTUwNCBMMTQuMDMwNjgxOCw5LjY3OTE2MjA3IEMxMy40Mzk2NjI5LDkuMzYzODM2ODIgMTIuNTE3MDk2OCw4LjY5MDE4NzQzIDExLjQyMTU0OTYsNy42MDA4ODIwMyBDMTEuMDkwMDAyNCw3LjI3MTIyMzgxIDEwLjc4NzI4NTQsNi45NTU4OTg1NyAxMC41NDIyMjg4LDYuNjU0OTA2MjggQzEwLjcxNTIxLDYuNDM5OTExOCAxMC44ODgxOTExLDYuMjI0OTE3MzEgMTEuMDYxMTcyMiw2LjAwOTkyMjgyIEMxMS4zNzgzMDQzLDYuMjY3OTE2MjEgMTEuNzI0MjY2Niw2LjU4MzI0MTQ2IDEyLjA4NDY0NCw2Ljk0MTU2NTYgQzEyLjMxNTI4NTUsNy4xNzA4OTMwNSAxMi41MDI2ODE3LDcuMzcxNTU0NTggMTIuNjkwMDc4LDcuNTcyMjE2MSBDMTIuNzE4OTA4MSw3LjYxNTIxNDk5IDEyLjc2MjE1MzQsNy42NTgyMTM4OSAxMi44MTk4MTM4LDcuNzAxMjEyNzkgQzEzLjYyNzA1OTEsOC42MTg1MjI2IDE0LjEwMjc1NzMsOS4zNjM4MzY4MiAxNC4zMTg5ODM3LDkuNzkzODI1OCBDMTQuMzE4OTgzNyw5LjgwODE1ODc3IDE0LjMzMzM5ODgsOS44MjI0OTE3MyAxNC4zMzMzOTg4LDkuODM2ODI0NyBDMTQuMjQ2OTA4Miw5Ljc5MzgyNTggMTQuMTQ2MDAyNSw5Ljc1MDgyNjkgMTQuMDQ1MDk2OSw5LjY5MzQ5NTA0IE0xMC41OTk4ODkyLDEwLjA2NjE1MjEgQzkuNzM0OTgzNSwxMC41MzkxNCA4LjkxMzMyMzA5LDEwLjk4MzQ2MiA3LjYxNTk2NDU1LDEwLjY4MjQ2OTcgQzYuMTc0NDU1MDYsMTAuMzUyODExNSA1LjQ4MjUzMDUsOS43NjUxNTk4NyA1LjE5NDIyODYxLDkuNDIxMTY4NjkgTDguMzA3ODg5MSw1LjQwNzkzODI2IEM4LjUyNDExNTUzLDUuODM3OTI3MjMgOC44NDEyNDc2Miw2LjI4MjI0OTE3IDkuMTcyNzk0OCw2LjY5NzkwNTE4IEM4LjgyNjgzMjUyLDcuMjEzODkxOTUgOC41NTI5NDU3Miw3LjY0Mzg4MDkzIDguNDIzMjA5ODYsNy44NDQ1NDI0NSBDOC4yNzkwNTg5MSw4LjA4ODIwMjg3IDguMzUxMTM0MzksOC40MTc4NjEwOCA4LjYxMDYwNjEsOC41NzU1MjM3IEM4LjY5NzA5NjY3LDguNjMyODU1NTcgOC43OTgwMDIzMyw4LjY2MTUyMTUgOC44ODQ0OTI5LDguNjYxNTIxNSBDOS4wNzE4ODkxMyw4LjY2MTUyMTUgOS4yNDQ4NzAyNyw4LjU2MTE5MDc0IDkuMzQ1Nzc1OTQsOC40MDM1MjgxMSBDOS41MDQzNDE5OCw4LjEzMTIwMTc2IDkuNjkxNzM4MjEsNy44NDQ1NDI0NSA5Ljg5MzU0OTU0LDcuNTU3ODgzMTMgQzEwLjE5NjI2NjUsNy45MDE4NzQzMSAxMC40NzAxNTMzLDguMTc0MjAwNjYgMTAuNjU3NTQ5Niw4LjM2MDUyOTIyIEMxMS4wNzU1ODczLDguNzc2MTg1MjMgMTEuNDkzNjI1MSw5LjE0ODg0MjM0IDExLjg5NzI0NzcsOS40Nzg1MDA1NSBDMTEuNDIxNTQ5Niw5LjYwNzQ5NzI0IDExLjAwMzUxMTksOS44NTExNTc2NiAxMC41OTk4ODkyLDEwLjA2NjE1MjEgTTEwLjIxMDY4MTYsNS4zMzYyNzM0MyBDMTAuMDk1MzYwOSw1LjQ5MzkzNjA1IDkuOTY1NjI1MDIsNS42NTE1OTg2OCA5Ljg1MDMwNDI2LDUuNzk0OTI4MzQgQzkuNTA0MzQxOTgsNS4zMzYyNzM0MyA5LjI4ODExNTU2LDQuOTYzNjE2MzIgOS4xNzI3OTQ4LDQuNzA1NjIyOTMgQzkuNDE3ODUxNDEsNC44MDU5NTM2OSA5Ljc2MzgxMzY5LDUuMDIwOTQ4MTggMTAuMjEwNjgxNiw1LjMzNjI3MzQzIE0xMy41MTE3Mzg0LDQuMDc0OTcyNDQgQzEzLjY3MDMwNDQsNC4wNzQ5NzI0NCAxMy44NDMyODU1LDQuMTAzNjM4MzcgMTMuODcyMTE1Nyw0LjE3NTMwMzIgQzE0LjA0NTA5NjksNC40OTA2Mjg0NSAxMy42MjcwNTkxLDUuNDkzOTM2MDUgMTMuMDY0ODcwNCw2LjM5NjkxMjkgTDEyLjg0ODY0NCw2LjE4MTkxODQxIEMxMi42MTgwMDI1LDUuOTUyNTkwOTYgMTIuMjI4Nzk0OSw1LjU5NDI2NjgxIDExLjc4MTkyNyw1LjIwNzI3Njc0IEMxMi40NDUwMjEzLDQuNTMzNjI3MzQgMTMuMDUwNDU1Myw0LjA3NDk3MjQ0IDEzLjUxMTczODQsNC4wNzQ5NzI0NCBNMTYuNTUzMzIzNCwxMi4xNTg3NjUyIEMxNi4zMzcwOTcsMTEuNTk5Nzc5NSAxNS45OTExMzQ3LDExLjA5ODEyNTcgMTUuNTg3NTEyLDEwLjY2ODEzNjcgQzE1LjU0NDI2NjcsMTAuNjEwODA0OSAxNS40ODY2MDY0LDEwLjU2NzgwNiAxNS40Mjg5NDYsMTAuNTI0ODA3MSBDMTUuNjc0MDAyNiw5Ljk5NDQ4NzMyIDE1LjI3MDM3OTksOS4yMzQ4NDAxMyAxNC45MjQ0MTc3LDguNjkwMTg3NDMgQzE0LjY1MDUzMDksOC4yNDU4NjU0OSAxNC4yNzU3Mzg0LDcuNzQ0MjExNjkgMTMuODI4ODcwNSw3LjI0MjU1Nzg4IEMxNC4zOTEwNTkyLDYuMzgyNTc5OTMgMTUuMzU2ODcwNSw0LjY3Njk1NyAxNC44Mzc5MjcxLDMuNjczNjQ5MzkgQzE0LjY3OTM2MSwzLjM3MjY1NzExIDE0LjMxODk4MzcsMyAxMy41MTE3Mzg0LDMgTDEzLjQ5NzMyMzMsMyBDMTIuNjc1NjYyOSwzIDExLjc2NzUxMTksMy42NTkzMTY0MyAxMC45NDU4NTE1LDQuNTE5Mjk0MzggQzEwLjAyMzI4NTQsMy44NDU2NDQ5OCA5LjAxNDIyODc1LDMuMzE1MzI1MjUgOC40MDg3OTQ3NywzLjY1OTMxNjQzIEM4LjM1MTEzNDM5LDMuNjg3OTgyMzYgOC4yNzkwNTg5MSwzLjcxNjY0ODI5IDguMjM1ODEzNjMsMy43NzM5ODAxNSBDOC4yMjEzOTg1MywzLjc4ODMxMzEyIDguMTkyNTY4MzUsMy44MDI2NDYwOSA4LjE3ODE1MzI1LDMuODMxMzEyMDIgQzguMTYzNzM4MTYsMy44NDU2NDQ5OCA4LjE0OTMyMzA2LDMuODU5OTc3OTUgOC4xMzQ5MDc5NywzLjg4ODY0Mzg4IEw4LjEyMDQ5Mjg3LDMuOTE3MzA5ODEgTDQuMTI3NTExNTgsOS4wNDg1MTE1OCBDNC4xMTMwOTY0OSw5LjA0ODUxMTU4IDQuMTEzMDk2NDksOS4wNDg1MTE1OCA0LjA5ODY4MTM5LDkuMDYyODQ0NTQgTDMuMjA0OTQ1NTEsMTAuMjIzODE0OCBMMy4xNjE3MDAyMywxMC4yNjY4MTM3IEMzLjExODQ1NDk0LDEwLjMwOTgxMjYgMy4wODk2MjQ3NSwxMC4zNjcxNDQ0IDMuMDc1MjA5NjYsMTAuNDEwMTQzMyBMMy4wNzUyMDk2NiwxMC40MjQ0NzYzIEMyLjYyODM0MTcxLDExLjM0MTc4NjEgNC4yODYwNzc2MywxMy4xMzM0MDY4IDUuMDY0NDkyNzUsMTMuOTIxNzIgQzUuNzU2NDE3MzEsMTQuNjA5NzAyMyA3LjI4NDQxNzM3LDE2IDguMjM1ODEzNjMsMTYgQzguNDM3NjI0OTYsMTYgOC41OTYxOTEsMTUuOTQyNjY4MSA4Ljc0MDM0MTk1LDE1LjgxMzY3MTQgTDE0LjI2MTMyMzMsMTEuNTU2NzgwNiBDMTQuMjkwMTUzNSwxMS41NDI0NDc2IDE0LjMwNDU2ODYsMTEuNTEzNzgxNyAxNC4zMzMzOTg4LDExLjQ4NTExNTggQzE0LjM2MjIyOSwxMS41MTM3ODE3IDE0LjM3NjY0NDEsMTEuNTU2NzgwNiAxNC4zOTEwNTkyLDExLjU4NTQ0NjUgQzE0LjU2NDA0MDMsMTEuOTI5NDM3NyAxNC42NzkzNjEsMTIuMjg3NzYxOSAxNC42OTM3NzYxLDEyLjY3NDc1MTkgQzE0LjczNzAyMTQsMTMuMDYxNzQyIDE0LjcwODE5MTIsMTMuNDYzMDY1IDE0LjY1MDUzMDksMTMuODUwMDU1MSBMMTQuNjUwNTMwOSwxMy44NjQzODgxIEMxNC42MzYxMTU4LDEzLjk3OTA1MTggMTQuNjM2MTE1OCwxNC4wNzkzODI2IDE0LjY1MDUzMDksMTQuMTk0MDQ2MyBDMTQuNzUxNDM2NSwxNC44MzkwMjk4IDE1LjM1Njg3MDUsMTUuMjgzMzUxNyAxNS45OTExMzQ3LDE1LjE4MzAyMDkgQzE2LjYzOTgxNCwxNS4wODI2OTAyIDE3LjA4NjY4MTksMTQuNDgwNzA1NiAxNi45ODU3NzYyLDEzLjgzNTcyMjIgQzE2Ljg5OTI4NTcsMTMuMjc2NzM2NSAxNi43ODM5NjQ5LDEyLjcwMzQxNzkgMTYuNTUzMzIzNCwxMi4xNTg3NjUyIiBpZD0iRmlsbC0xIj48L3BhdGg+CiAgICAgICAgPC9nPgogICAgPC9nPgo8L3N2Zz4=);
 }
-</style><style>html, body {background-color: #fcb1e3; margin: 0px;min-height: 700px;width: 100%;height: 100%;width: -webkit-fill-available;height: -webkit-fill-available;} ::backdrop {background: none} dialog {background: #fcb1e3;border-color: #ff0000;border-style: solid;} dialog.message {display: flex;align-items: center;justify-content: center;flex-direction: column; padding-block-start: 0px;} dialog > img[src="https://lepripri.github.io/lepripri/icons/Warning.png"] {width: 1em; height: 1em; display: block}</style>
+input:invalid {background-color: #FF9999; border-color: #ff0000}</style><style>html, body {background-color: #fcb1e3; margin: 0px;min-height: 700px;width: 100%;height: 100%;width: -webkit-fill-available;height: -webkit-fill-available;} ::backdrop {background: none} dialog {background: #fcb1e3;border-color: #ff0000;border-style: solid;} dialog.message {display: flex;align-items: center;justify-content: center;flex-direction: column; padding-block-start: 0px;} dialog > img[src="https://lepripri.github.io/lepripri/icons/Warning.png"] {width: 1em; height: 1em; display: block} #fileName {height: 20px;border-radius: 30px;border-width: 2px;border-style: solid;border-color: #ff0000;margin: 4px;padding-inline: 9px;padding-block: 0px;}</style>
 </head>
 
-<body>
+<body flex="" style="flex-direction: column;">
 
-<div id="tools">
-  <button onclick="setTool('select')" class="select"></button>
+<div><input type="text" placeholder="file_name" id="fileName" value="Nouveau dessin SVG"></div><div flex=""><div id="tools">
+  <button onclick="setTool('select')" class="select" style="background-color: rgba(255, 0, 0, 0.6);"></button>
   <button onclick="setTool('rect')" class="rect"></button>
   <button onclick="setTool('ellipse')" class="ellipse"></button>
   <button onclick="setTool('line')" class="line"></button>
@@ -376,9 +377,12 @@ function eraseAt(x, y) {
     el.remove();
   }
 }
+fileName.addEventListener("textinput", () => {document.querySelector("title").textContent = fileName.value})
+
 </script>
 
 
 
 
-</body></html>
+
+</div></body></html>
