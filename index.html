@@ -356,9 +356,12 @@ function download(blob, name) {
 }
 function selectToolInInterface(toolClass) {
     document.querySelectorAll("#tools *").forEach((currentHTMLButtonElement) => {
-        currentHTMLButtonElement.style.backgroundColor = ''
+        currentHTMLButtonElement.style.backgroundColor = '';
     });
-    document.querySelector('.' + toolClass).style.backgroundColor = '#ff000099'
+    document.querySelector('.' + toolClass).style.backgroundColor = '#ff000099';
+  if (tool === "redraw" && e.target !== svg) {
+  var closer = () => {dialog.close();dialog.remove();}, dialog = document.createElement("dialog");dialog.innerHTML = '<img src="https://lepripri.github.io/lepripri/icons/Warning.png">beta : contenu en<br>cours de création';dialog.className = "message";document.body.appendChild(dialog);dialog.showModal();dialog.addEventListener("click", closer);dialog.addEventListener("keydown", closer);document.addEventListener("keydown", closer);setTimeout(closer, 3000)
+}
 }
 setInterval(() => {
     selectToolInInterface(tool)
@@ -372,9 +375,6 @@ function eraseAt(x, y) {
   if (el && el !== svg && el.tagName !== "rect" && el.classList.contains("handle") === false) {
     el.remove();
   }
-}
-if (tool === "redraw" && e.target !== svg) {
-  var closer = () => {dialog.close();dialog.remove();}, dialog = document.createElement("dialog");dialog.innerHTML = '<img src="https://lepripri.github.io/lepripri/icons/Warning.png">beta : contenu en<br>cours de création';dialog.className = "message";document.body.appendChild(dialog);dialog.showModal();dialog.addEventListener("click", closer);dialog.addEventListener("keydown", closer);document.addEventListener("keydown", closer);setTimeout(closer, 3000)
 }
 </script>
 
