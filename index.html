@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="fr"><head>
 <meta charset="UTF-8">
-<title>nouveau Dessin SVG – le pripri draw</title>
+<title>Nouveau Dessin SVG – le pripri draw</title>
 
 <style>
 /* ===== STYLE PRIPRI ===== */
@@ -344,7 +344,7 @@ function startRotate(e) {
 function exportSVG() {
   removeHandles();
   const blob = new Blob([svg.outerHTML], { type: "image/svg+xml" });
-  download(blob, "pripri.svg");
+  download(blob, `{new Date().toLocaleDateString().replaceAll("/", "-")} Nouveau Dessin SVG.svg`);
   createHandles();
 }
 
