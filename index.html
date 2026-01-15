@@ -355,6 +355,9 @@ function download(blob, name) {
   a.click();
 }
 function selectToolInInterface(toolClass) {
+    document.querySelectorAll("#tools *").forEach((currentHTMLButtonElement) => {
+        currentHTMLButtonElement.style.backgroundColor = ''
+    });
     document.querySelector('.' + toolClass).style.backgroundColor = '#ff000099'
 }
 setInterval(() => {
