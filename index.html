@@ -409,10 +409,12 @@ function selectToolInInterface(toolClass) {
         currentHTMLButtonElement.style.backgroundColor = '';
     });
     document.querySelector('.' + toolClass).style.backgroundColor = '#ff000099';
-  if (tool === "redraw" && !document.querySelector("dialog.message")) {
-    showMessage("indisponible pour le moment.<br>bientot disponible");
-    setTool('select')
-  }
+  setTimeout(() => {
+    if (tool === "redraw" && !document.querySelector("dialog.message")) {
+      setTool('select');
+      showMessage("indisponible pour le moment.<br>bientot disponible");
+    }
+  }, 200);
 }
 setInterval(() => {
     selectToolInInterface(tool)
