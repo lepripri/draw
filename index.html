@@ -186,7 +186,10 @@ let startX = 0, startY = 0;
 let handles = [];
 let path = null;
 let lastX = 0, lastY = 0;
-
+/* ==== message ==== */
+function showMessage(data) {
+    var closer = () => {dialog.close();dialog.remove();}, dialog = document.createElement("dialog");dialog.innerHTML = '<img src="https://lepripri.github.io/lepripri/icons/Warning.png">beta : contenu en<br>' + data;dialog.className = "message", Opener = () => {if (!document.querySelector('dialog.message')) {document.body.appendChild(dialog);dialog.showModal();dialog.addEventListener("click", closer);dialog.addEventListener("keydown", closer);document.addEventListener("keydown", closer);setTimeout(closer, 3000);clearInterval(Opener)}};setInterval(Opener, 10);
+}
 /* ===== TOOLS ===== */
 function setTool(t) {
   tool = t;
@@ -407,8 +410,8 @@ function selectToolInInterface(toolClass) {
     });
     document.querySelector('.' + toolClass).style.backgroundColor = '#ff000099';
   if (tool === "redraw") {
-  var closer = () => {dialog.close();dialog.remove();}, dialog = document.createElement("dialog");dialog.innerHTML = '<img src="https://lepripri.github.io/lepripri/icons/Warning.png">beta : contenu en<br>cours de création';dialog.className = "message";document.body.appendChild(dialog);dialog.showModal();dialog.addEventListener("click", closer);dialog.addEventListener("keydown", closer);document.addEventListener("keydown", closer);setTimeout(closer, 3000)
-}
+    showMessage("indisponible pour le moment. <br>veillez patienter")
+  }
 }
 setInterval(() => {
     selectToolInInterface(tool)
