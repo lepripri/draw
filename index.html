@@ -414,7 +414,7 @@ function selectToolInInterface(toolClass) {
   setTimeout(() => {
     if (tool === "redraw" && !document.querySelector("dialog.message")) {
       (() => {
-        if (text === lastRedrawMessage) return;
+        if (lastRedrawMessage === true) return;
         lastRedrawMessage = true;
         setTool('select');
         showMessage("indisponible pour le moment.<br>bientot disponible");
