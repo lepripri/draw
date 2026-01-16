@@ -186,12 +186,10 @@ let startX = 0, startY = 0;
 let handles = [];
 let path = null;
 let lastX = 0, lastY = 0;
-let lastMessage = "";
+let lastRedrawMessage = "";
 
 /* ==== message ==== */
 function showMessage(data, OPTIONALendScript) {
-    if (text === lastMessage) return;
-    lastMessage = text;
     var closer = () => {setTimeout(() => {dialog.close();dialog.remove(); if(OPTIONALendScript) {OPTIONALendScript()}}, 350)}, dialog = document.createElement("dialog");dialog.innerHTML = '<img src="https://lepripri.github.io/lepripri/icons/Warning.png">' + data;dialog.className = "message", Opener = () => {if (!document.querySelector('dialog.message')) {document.body.appendChild(dialog);dialog.showModal();dialog.addEventListener("click", closer);dialog.addEventListener("keydown", closer);document.addEventListener("keydown", closer);setTimeout(closer, 2000);clearInterval(Opener)}};setInterval(Opener, 10);
 }
 /* ===== TOOLS ===== */
@@ -415,8 +413,14 @@ function selectToolInInterface(toolClass) {
     document.querySelector('.' + toolClass).style.backgroundColor = '#ff000099';
   setTimeout(() => {
     if (tool === "redraw" && !document.querySelector("dialog.message")) {
-      setTool('select');
-      showMessage("indisponible pour le moment.<br>bientot disponible");
+      (() => {
+        if (text === lastRedrawMessage) return;
+        lastRedrawMessage = true;
+        setTool('select');
+        showMessage("indisponible pour le moment.<br>bientot disponible");
+      })();
+    }else{
+      lastRedrawMessage = false;
     }
   }, 200);
 }
